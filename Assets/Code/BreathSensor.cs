@@ -6,7 +6,7 @@ public class BreathSensor : MonoBehaviour
 
     [Header("Sensitivity")]
     [Tooltip("Lower = more instant. 0.01 is very sensitive.")]
-    public float sensitivity = 0.01f; 
+    public float sensitivity = 0.03f; 
 
     public bool isInhaling { get; private set; }
     private float _lastPitch;
