@@ -4,26 +4,28 @@ public class BreathSensor : MonoBehaviour
 {
     public static BreathSensor Instance;
 
-    [Header("Detection Settings")]
-    public float motionThreshold = 0.0005f; 
-    
+    [Header("Sensitivity")]
+    [Tooltip("Lower = more instant. 0.01 is very sensitive.")]
+    public float sensitivity = 0.01f; 
+
     public bool isInhaling { get; private set; }
-    private float _lastY;
+    private float _lastPitch;
 
     void Awake() => Instance = this;
 
-    void Start()
-    {
-        _lastY = transform.localPosition.y;
-    }
-
     void Update()
     {
-        float currentY = transform.localPosition.y;
-        float deltaY = currentY - _lastY;
-        _lastY = currentY;
+        float currentPitch = transform.localEulerAngles.x;
+        if (currentPitch > 180) currentPitch -= 360; 
 
-        // If head is moving up, state is 'True'
-        isInhaling = (deltaY > motionThreshold);
+        float delta = currentPitch - _lastPitch;
+        _lastPitch = currentPitch;
+
+        // Instant switch: No timers, no lists. 
+        // As soon as the delta exceeds sensitivity, the state flips.
+        if (Mathf.Abs(delta) > sensitivity)
+        {
+            isInhaling = delta > 0;
+        }
     }
 }

@@ -2,19 +2,20 @@ using UnityEngine;
 
 public class BreathVisualizer : MonoBehaviour
 {
-    [Header("Scale Settings")]
+    [Header("Visual Bounds")]
     public float minScale = 0.3f;
-    public float maxScale = 2.0f;
-    public float growSpeed = 0.6f; 
-
-    [Header("Color Settings")]
-    public Color idleColor = Color.blue;
-    public Color breathColor = Color.green;
+    public float maxScale = 1.0f;
+    
+    [Header("Fluidity")]
+    [Tooltip("6 is smooth; 10+ is very snappy.")]
+    public float transitionSpeed = 6.0f; 
 
     private Material _mat;
+    private float _currentT; 
 
     void Start()
     {
+        // Get the material once at the start to save performance
         _mat = GetComponent<Renderer>().material;
     }
 
@@ -22,22 +23,22 @@ public class BreathVisualizer : MonoBehaviour
     {
         if (BreathSensor.Instance == null) return;
 
-        float targetSize = BreathSensor.Instance.isInhaling ? maxScale : minScale;
-        Vector3 targetScale = new Vector3(targetSize, targetSize, targetSize);
+        // 1. Determine target scale based on breath state
+        bool inhaling = BreathSensor.Instance.isInhaling;
+        float targetS = inhaling ? maxScale : minScale;
 
-        // Smoothly transition scale
-        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * growSpeed);
+        // 2. Smoothly Scale (No position changes here)
+        float lerpStep = Time.deltaTime * transitionSpeed;
+        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * targetS, lerpStep);
 
-        // Color math based on scale percentage
-        float t = (transform.localScale.x - minScale) / (maxScale - minScale);
-        Color finalColor = Color.Lerp(idleColor, breathColor, t);
-        finalColor.a = Mathf.Lerp(0.1f, 0.8f, t);
+        // 3. Color Shift (Synced to current scale)
+        // This ensures the color transition feels "physical"
+        _currentT = Mathf.InverseLerp(minScale, maxScale, transform.localScale.x);
         
-        if (_mat != null)
-        {
-            _mat.SetColor("_BaseColor", finalColor);
-            _mat.SetColor("_EmissionColor", finalColor * t * 1.5f);
-            _mat.EnableKeyword("_EMISSION");
-        }
+        Color finalColor = Color.Lerp(Color.blue, Color.green, _currentT);
+        _mat.color = finalColor;
+        
+        // Optional: Adds a slight glow that gets stronger as you inhale
+        _mat.SetColor("_EmissionColor", finalColor * (_currentT * 0.5f));
     }
 }

@@ -144,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 171305649}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
+  m_LocalPosition: {x: 0, y: 0, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -320,7 +320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ca290a9b4b446548b793a6119092572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreathSensor
-  motionThreshold: 0.001
+  sensitivity: 0.05
 --- !u!1 &367598535
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,8 +929,8 @@ GameObject:
   - component: {fileID: 1919842831}
   - component: {fileID: 1919842830}
   - component: {fileID: 1919842829}
-  - component: {fileID: 1919842832}
   - component: {fileID: 1919842833}
+  - component: {fileID: 1919842834}
   m_Layer: 6
   m_Name: BreathingSphere
   m_TagString: Untagged
@@ -1031,23 +1031,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1919842826}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1919842832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1919842826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efc553c7ac47314f832022bd66fa1c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreathVisualizer
-  minScale: 0.3
-  maxScale: 2
-  growSpeed: 2
-  idleColor: {r: 0, g: 0, b: 1, a: 1}
-  breathColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!114 &1919842833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1062,6 +1045,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CamFollow
   followTarget: {fileID: 171305650}
   followSpeed: 0.02
+--- !u!114 &1919842834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919842826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3efc553c7ac47314f832022bd66fa1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreathVisualizer
+  minScale: 0.3
+  maxScale: 2
+  transitionSpeed: 2
 --- !u!1 &2028580687
 GameObject:
   m_ObjectHideFlags: 0
