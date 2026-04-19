@@ -848,6 +848,7 @@ GameObject:
   - component: {fileID: 1486985204}
   - component: {fileID: 1486985206}
   - component: {fileID: 1486985205}
+  - component: {fileID: 1486985207}
   m_Layer: 6
   m_Name: XR Rig
   m_TagString: Player
@@ -917,6 +918,20 @@ MonoBehaviour:
   moveStick: 4
   rotStick: 5
   body: {fileID: 892349860}
+--- !u!114 &1486985207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486985203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccfb8e9170c21c0409cea442bbb66f83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneSwitcher
+  nextSceneName: GrabTest
+  controller: 5
 --- !u!1 &1919842826
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -53,4 +53,4 @@ public class XRPlayerMove : MonoBehaviour
         moveDir.y = _rigidbody.linearVelocity.y;
         _rigidbody.linearVelocity = moveDir;
     }
-}
+}*/

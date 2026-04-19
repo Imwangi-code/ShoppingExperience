@@ -1,77 +1,116 @@
+using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.XR;
 
 public class PlayerMove : MonoBehaviour
 {
+    public float speed = 5.0f;
+    public XRNode moveStick = XRNode.LeftHand;
+    public XRNode rotStick = XRNode.RightHand;
 
-    int moveSpeed = 5; //how fast the player moves
-    float lookSpeedX = .2f; //left/right muse sensitivity
-    float lookSpeedY = .2f; //up/down mouse sensitivity
-    int jumpForce = 300; //amount of force applied to create a jump
+    public Transform body;
+    private Rigidbody _rigidbody;
+    private Transform camTrans;
+    private bool justClicked = false;
+    private float rot = 0;
 
-    Transform camTrans; //a reference to the camera's transform
-    float xRotation;
-    float yRotation;
-    Rigidbody _rigidbody; //a reference to the player's rigidbody, _ is a naming convention for private variables
-
-    InputAction moveAction; //reference to the move input action
-    InputAction lookAction; //reference to the look input action
-    InputAction jumpAction; //reference to the jump input action
-
-
-    //The physics layers you want the player to be able to jump off of. Just dont include the layer the palyer is on.
-    public LayerMask groundLayer;
-    //public Transform feetTrans; //Position of where the players feet touch the ground
-    float groundCheckDist = .35f; //How far down to check for the ground. The radius of Physics.CheckSphere
-    public bool grounded = false; //Is the player on the ground
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // Get the main camera reference
+        if (Camera.main != null)
+        {
+            camTrans = Camera.main.transform;
+        }
+        else
+        {
+            Debug.LogError("No Main Camera found! Please tag your XR Camera as 'MainCamera'.");
+        }
 
-        Cursor.lockState = CursorLockMode.Locked; //Hides the mouse and locks it ot the center of the screen
+        _rigidbody = GetComponent<Rigidbody>();
 
-        camTrans = Camera.main.transform; //get the main camera's transform
-        _rigidbody = GetComponent<Rigidbody>(); //get the player's rigidbody... get component is expensive, so we only do it once here in start
+        // Align the body to the camera's starting position (ignoring height)
+        if (body != null && camTrans != null)
+        {
+            body.position = new Vector3(camTrans.position.x, body.position.y, camTrans.position.z);
+        }
+    }
 
-        //get references to the input actions
-        moveAction = InputSystem.actions.FindAction("Move"); //Find the set of actios in the input system called "Move"
-        lookAction = InputSystem.actions.FindAction("Look");
-        jumpAction = InputSystem.actions.FindAction("Jump");
+    void Update()
+    {
+        // Snap Turning Logic
+        InputDevices.GetDeviceAtXRNode(rotStick).TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 joyStick);
         
+        if (!justClicked)
+        {
+            if (joyStick.x > 0.8f)
+            {
+                rot += 90;
+                _rigidbody.MoveRotation(Quaternion.Euler(0, rot, 0));
+                justClicked = true;
+            }
+            else if (joyStick.x < -0.8f)
+            {
+                rot -= 90;
+                _rigidbody.MoveRotation(Quaternion.Euler(0, rot, 0));
+                justClicked = true;
+            }
+        }
+        else if (Mathf.Abs(joyStick.x) < 0.2f)
+        {
+            justClicked = false;
+        }
     }
 
     void FixedUpdate()
     {
-        //Creates a movement vector local to the direction the player is facing.
-        Vector3 moveDir = transform.forward * moveAction.ReadValue<Vector2>().y + transform.right * moveAction.ReadValue<Vector2>().x; //Use Move X and Y for forward and strafing movement
-        moveDir *= moveSpeed;
-        moveDir.y = _rigidbody.linearVelocity.y; // We dont want y so we replace y with that the _rigidbody.velocity.y already is.
-        _rigidbody.linearVelocity = moveDir; // Set the velocity to our movement vector
+        if (camTrans == null) return;
 
-         //The sphere check draws a sphere like a ray cast and returns true if any collider is withing its radius.
-        //grounded is set to true if a sphere at feetTrans.position with a radius of groundCheckDist detects any objects on groundLayer within it
-        grounded = Physics.CheckSphere(transform.position, groundCheckDist, groundLayer);    
-        
+        // Get Input from movement stick
+        InputDevices.GetDeviceAtXRNode(moveStick).TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 direction);
+
+        // 1. Get Camera Direction
+        Vector3 forward = camTrans.forward;
+        Vector3 right = camTrans.right;
+
+        // 2. Flatten Direction (Y = 0) so looking up/down doesn't affect movement speed or direction
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+
+        // 3. Calculate Final Move Vector
+        Vector3 moveDir = (forward * direction.y + right * direction.x) * speed;
+
+        // 4. Apply movement while preserving gravity
+        moveDir.y = _rigidbody.linearVelocity.y;
+        _rigidbody.linearVelocity = moveDir;
     }
 
-    // Update is called once per frame
-    void Update()
+
+/*
+public class PlayerMove : MonoBehaviour
+{
+
+    int speed = 5;
+    public XRNode handRole = XRNode.LeftHand;
+    Rigidbody _rigidbody;
+    Transform camTrans;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        yRotation += lookAction.ReadValue<Vector2>().x * lookSpeedX; //get the x value of the look input and multiply it by the look speed
-        xRotation -= lookAction.ReadValue<Vector2>().y * lookSpeedY; //get  the y value of the look input and multiply it by the look speed, this is negative bc moving the mouse up gives a negative y value (inverted)
-        xRotation = Mathf.Clamp(xRotation, -90, 90); //keeps the up/down head rotation realistic btwn -90 and 90 degrees
-
-        camTrans.localEulerAngles = new Vector3(xRotation, 0, 0); //apply the x rotation to the camera's local rotation, rotate head up/down
-        transform.eulerAngles = new Vector3(0, yRotation, 0); //apply the y rotation to the player's rotation, rotate body left/right
-
-          if (grounded && jumpAction.WasPressedThisFrame()) //if the player is on the ground and press Spacebar
-        {
-            _rigidbody.linearVelocity = Vector3.zero; //Zero out gravity before applying the jumpForce
-            _rigidbody.AddForce(new Vector3(0, jumpForce, 0)); // Add a force jumpForce in the Y direction
-        }
+        camTrans = Camera.main.transform;
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
+    void FixedUpdate()
+    {
+        InputDevices.GetDeviceAtXRNode(node: handRole).TryGetFeatureValue(usage: CommonUsages.primary2DAxis, value: out Vector2 direction);
+        Vector3 moveDir = camTrans.forward * direction.y + camTrans.right * direction.x;
+        moveDir = moveDir.normalized * speed;
+        moveDir.y = _rigidbody.linearVelocity.y;
+        _rigidbody.linearVelocity = moveDir;
+    }
+}
 
+*/
 }
