@@ -8,9 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/GrabTest.unity
     guid: e8f2dfe024588c44891111f1eb6a662d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Scene 1.unity
     guid: f1c15a65b14be47af84462143c17b29c
+  - enabled: 1
+    path: Assets/Scenes/ArchiveScene1.unity
+    guid: f65a6cd78097c4548a808da613d202a1
+  - enabled: 1
+    path: Assets/Scenes/Meditation.unity
+    guid: c21c4740bf4230a4a84896ef7dcfd6f3
+  - enabled: 1
+    path: Assets/Scenes/Scene 2.unity
+    guid: a88d13952641749f0a8cb184d59e89b8
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 9241134c7852779458f1d4611beb5cdb, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 145604106a74f364b8e0fc33cd098708, type: 2}
