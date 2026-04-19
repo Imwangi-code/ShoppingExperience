@@ -1316,7 +1316,7 @@ MonoBehaviour:
   - {fileID: 1032502787}
   - {fileID: 1878640609}
   - {fileID: 1032502786}
-  stressLevel: 1
+  stressLevel: 0
 --- !u!4 &869298255
 Transform:
   m_ObjectHideFlags: 0
